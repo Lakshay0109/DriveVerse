@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, useGLTF, ContactShadows, Html, useProgress } from '@react-three/drei';
 import * as THREE from 'three';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 
 function Loader() {
   const { progress } = useProgress();
@@ -23,16 +24,21 @@ function CarModel({ rotationY }: { rotationY: number }) {
   React.useMemo(() => {
     // Apply realistic materials, specific to the ferrari.glb structure found in three.js examples
     const bodyMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xff2800, // Ferrari red
-      metalness: 0.8,
-      roughness: 0.1,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.05,
-      sheen: 0.3
+      color: 0x0f172a, // Matte dark blue
+      metalness: 0.2, // Low metalness for matte look
+      roughness: 0.7, // High roughness for matte look
+      clearcoat: 0.0, // No clearcoat
+      sheen: 0.2
+    });
+
+    const interiorMaterial = new THREE.MeshStandardMaterial({
+      color: 0x111111, // Dark black interior
+      metalness: 0.1,
+      roughness: 0.8
     });
 
     const detailsMaterial = new THREE.MeshStandardMaterial({
-      color: 0x222222,
+      color: 0x111111,
       metalness: 0.8,
       roughness: 0.2
     });
@@ -47,9 +53,23 @@ function CarModel({ rotationY }: { rotationY: number }) {
     });
 
     const rimsMaterial = new THREE.MeshStandardMaterial({
-      color: 0xe0e0e0,
-      metalness: 1.0,
-      roughness: 0.2
+      color: 0x111111, // Black alloy wheels
+      metalness: 0.7,
+      roughness: 0.5
+    });
+
+    const headlightsMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0xffffff,
+      emissiveIntensity: 5.0, // Glow
+      toneMapped: false,
+    });
+
+    const rearLightsMaterial = new THREE.MeshStandardMaterial({
+      color: 0xff0000,
+      emissive: 0xff0000,
+      emissiveIntensity: 5.0, // Glow
+      toneMapped: false,
     });
 
     scene.traverse((child: any) => {
@@ -65,6 +85,12 @@ function CarModel({ rotationY }: { rotationY: number }) {
           child.material = rimsMaterial;
         } else if (child.name === 'trim') {
           child.material = detailsMaterial;
+        } else if (['interior_dark', 'interior_light'].includes(child.name) || child.name.includes('interior')) {
+          child.material = interiorMaterial;
+        } else if (child.name === 'lights' || child.name === 'leds') {
+          child.material = headlightsMaterial;
+        } else if (child.name === 'lights_red' || child.name === 'steering_red_lights') {
+          child.material = rearLightsMaterial;
         }
       }
     });
@@ -105,6 +131,10 @@ export const CarScene = ({ rotationY = 0, cameraZ = 6 }: { rotationY?: number, c
         {/* Contact shadow for realistic grounding */}
         <ContactShadows position={[2.5, -0.8, 0]} opacity={0.6} scale={10} blur={2.5} far={4} color="#000000" />
       </Suspense>
+
+      <EffectComposer>
+        <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
+      </EffectComposer>
     </Canvas>
   );
 };
