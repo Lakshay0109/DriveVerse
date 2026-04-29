@@ -17,7 +17,8 @@ export const SmartFinder = () => {
   const getRecommendation = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/recommendations', {
+      const API_URL = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API_URL}/api/recommendations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

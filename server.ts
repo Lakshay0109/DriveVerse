@@ -3,6 +3,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import cors from "cors";
 import { Car } from "./src/server/models/Car.ts";
 import { Wishlist } from "./src/server/models/Wishlist.ts";
 import { seedCars } from "./src/server/seed.ts";
@@ -52,8 +53,9 @@ async function startServer() {
   await connectDB();
 
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
+  app.use(cors());
   app.use(express.json());
 
   // === NEW "Buy Car" Module Endpoints (MongoDB) ===

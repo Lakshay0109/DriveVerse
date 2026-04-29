@@ -7,6 +7,8 @@ export interface CarFilters {
   bodyType?: 'all' | 'suv' | 'sedan' | 'hatchback' | 'coupe' | 'truck';
 }
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 interface AppState {
   cars: LegacyCar[];
   activeCar: LegacyCar | null;
@@ -38,7 +40,7 @@ export const useStore = create<AppState>((set, get) => ({
   fetchCars: async () => {
     set({ isLoading: true });
     try {
-      const res = await fetch('/api/legacy-cars');
+      const res = await fetch(`${API_URL}/api/legacy-cars`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -55,7 +57,7 @@ export const useStore = create<AppState>((set, get) => ({
   fetchNewCars: async (filters) => {
     set({ isLoading: true });
     try {
-      let url = '/api/cars';
+      let url = `${API_URL}/api/cars`;
       if (filters) {
         const params = new URLSearchParams();
         if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
@@ -81,7 +83,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   fetchWishlist: async () => {
     try {
-      const res = await fetch('/api/wishlist');
+      const res = await fetch(`${API_URL}/api/wishlist`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -107,9 +109,9 @@ export const useStore = create<AppState>((set, get) => ({
 
     try {
       if (isWishlisted) {
-        await fetch(`/api/wishlist/${carId}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/api/wishlist/${carId}`, { method: 'DELETE' });
       } else {
-        await fetch('/api/wishlist', {
+        await fetch(`${API_URL}/api/wishlist`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ carId })
@@ -123,7 +125,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   addBid: async (carId, amount, user) => {
     try {
-      const res = await fetch(`/api/legacy-cars/${carId}/bids`, {
+      const res = await fetch(`${API_URL}/api/legacy-cars/${carId}/bids`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, user })
