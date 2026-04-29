@@ -3,9 +3,9 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { Car } from "./src/server/models/Car";
-import { Wishlist } from "./src/server/models/Wishlist";
-import { seedCars } from "./src/server/seed";
+import { Car } from "./src/server/models/Car.ts";
+import { Wishlist } from "./src/server/models/Wishlist.ts";
+import { seedCars } from "./src/server/seed.ts";
 
 // Legacy mock data for older endpoints not part of this specific request
 const MOCK_CARS = [

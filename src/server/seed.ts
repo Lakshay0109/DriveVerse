@@ -1,4 +1,4 @@
-import { Car } from './models/Car';
+import { Car } from './models/Car.ts';
 
 export const seedCars = async () => {
   // Always refresh cars so that we get the latest images without 404 errors
